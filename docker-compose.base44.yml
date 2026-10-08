@@ -1,0 +1,23 @@
+services:
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile.base44
+    volumes:
+      - .:/home/node
+      - node-build-out:/home/node/out
+      - /tmp/server.mjs:/tmp/server.mjs:ro
+    ports:
+      - "3000:3000"
+    environment:
+      - BASE44_PREVIEW_MODE=${BASE44_PREVIEW_MODE:-}
+    command: ["sh", "-ec", "./configure && make -j$$(nproc) && exec ./out/Release/node /tmp/server.mjs"]
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:3000/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 14400s
+volumes:
+  node-build-out:
