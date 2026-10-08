@@ -6,18 +6,17 @@ services:
     volumes:
       - .:/home/node
       - node-build-out:/home/node/out
-      - /tmp/server.mjs:/tmp/server.mjs:ro
     ports:
       - "3000:3000"
     environment:
       - BASE44_PREVIEW_MODE=${BASE44_PREVIEW_MODE:-}
-    command: ["sh", "-ec", "./configure && make -j$$(nproc) && exec ./out/Release/node /tmp/server.mjs"]
+    command: ["python3", "/home/node/.base44/bootstrap.py"]
     restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:3000/"]
+      test: ["CMD", "curl", "-sf", "http://localhost:3000/health"]
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 14400s
+      start_period: 60s
 volumes:
   node-build-out:
